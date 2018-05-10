@@ -167,7 +167,7 @@ public class TaskBased {
 
     public static void main(String... args) {
         long start = System.nanoTime();
-        BigInteger result = new TaskBased(4, new BitCountBasedTaskSize(10)).factorial(1000000);
+        BigInteger result = new TaskBased(3, new BitCountBasedTaskSize(100)).factorial(10000000);
         long end = System.nanoTime();
         System.out.println("Bit count: " + result.bitCount());
         System.out.println("Time " + TimeUnit.NANOSECONDS.toSeconds(end-start) + " sec");

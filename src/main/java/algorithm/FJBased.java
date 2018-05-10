@@ -1,7 +1,9 @@
 package algorithm;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.TimeUnit;
@@ -10,14 +12,18 @@ import java.util.stream.IntStream;
 
 public class FJBased {
     private final int parallelism;
+    private final boolean shuffle;
+    private final int thresholdSize;
 
-    public FJBased(int parallelism) {
+    public FJBased(int parallelism, boolean shuffle, int thresholdSize) {
         this.parallelism = parallelism;
+        this.shuffle = shuffle;
+        this.thresholdSize = thresholdSize;
     }
 
     public static void main(String... args) {
         long start = System.nanoTime();
-        BigInteger result = new FJBased(3).factorial(1000000);
+        BigInteger result = new FJBased(3, true, 1000).factorial(10000000);
         long end = System.nanoTime();
         System.out.println("Bit count: " + result.bitCount());
         System.out.println("Time " + TimeUnit.NANOSECONDS.toSeconds(end-start) + " sec");
@@ -28,7 +34,10 @@ public class FJBased {
         List<BigInteger> sequence = IntStream.rangeClosed(1, n)
                 .mapToObj(BigInteger::valueOf)
                 .collect(Collectors.toList());
-        BigInteger result = pool.invoke(new Computation(10, sequence, 0, n, pool));
+        if (shuffle) {
+            Collections.shuffle(sequence, new Random(1000000));
+        }
+        BigInteger result = pool.invoke(new Computation(thresholdSize, sequence, 0, n, pool));
         return result;
     }
 
